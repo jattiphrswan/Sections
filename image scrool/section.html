@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RGB Glowing Gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            /* Changed section background to black */
+            background-color: #000000; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 60px 0;
+        }
+
+        .gallery-section {
+            width: 100%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 30px; /* Increased gap so glows don't overlap too much */
+        }
+
+        .row {
+            display: flex;
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .track {
+            display: flex;
+            gap: 30px;
+            flex-shrink: 0;
+            will-change: transform;
+        }
+
+        /* Animations for scrolling */
+        @keyframes scroll-left {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        @keyframes scroll-right {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(0); }
+        }
+
+        .row-1 .track {
+            animation: scroll-left 40s linear infinite;
+        }
+
+        .row-2 .track {
+            animation: scroll-right 45s linear infinite;
+        }
+
+        /* Pause animation on hover */
+        .gallery-section:hover .track {
+            animation-play-state: paused;
+        }
+
+        /* Card Styling & RGB Glowing Border */
+        .card {
+            flex-shrink: 0;
+            width: 450px;
+            height: 280px;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            background: #111;
+            
+            /* RGB Glow Animation */
+            border: 2px solid #fff;
+            animation: rgb-glow 4s linear infinite; /* 4s cycle through colors */
+            transition: transform 0.3s ease;
+        }
+
+        /* The RGB color cycling keyframes */
+        @keyframes rgb-glow {
+            0%   { border-color: #ff0000; box-shadow: 0 0 10px #ff0000, 0 0 20px rgba(255,0,0,0.5); }
+            25%  { border-color: #ffea00; box-shadow: 0 0 10px #ffea00, 0 0 20px rgba(255,234,0,0.5); }
+            50%  { border-color: #00ffcc; box-shadow: 0 0 10px #00ffcc, 0 0 20px rgba(0,255,204,0.5); }
+            75%  { border-color: #cc00ff; box-shadow: 0 0 10px #cc00ff, 0 0 20px rgba(204,0,255,0.5); }
+            100% { border-color: #ff0000; box-shadow: 0 0 10px #ff0000, 0 0 20px rgba(255,0,0,0.5); }
+        }
+
+        /* Hover effect */
+        .card:hover {
+            transform: translateY(-10px) scale(1.02); /* Slight zoom and lift */
+            z-index: 10;
+        }
+
+        .card img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card .overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.9)); /* Darker gradient for black bg */
+            color: white;
+            pointer-events: none;
+        }
+
+        .card .overlay h3 {
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+
+        .card .overlay p {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .card {
+                width: 320px;
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <section class="gallery-section">
+        <!-- Row 1 (Scrolls Left) -->
+        <div class="row row-1">
+            <div class="track" id="track1"></div>
+        </div>
+
+        <!-- Row 2 (Scrolls Right) -->
+        <div class="row row-2">
+            <div class="track" id="track2"></div>
+        </div>
+    </section>
+
+    <script>
+        // Data for Row 1
+        const images1 = [
+            { url: "https://picsum.photos/seed/oro/450/280", title: "Oro", desc: "Your data, rewarded." },
+            { url: "https://picsum.photos/seed/notebook/450/280", title: "Notebook", desc: "Creative writing tool." },
+            { url: "https://picsum.photos/seed/poster/450/280", title: "Poster Design", desc: "Event management." },
+            { url: "https://picsum.photos/seed/pixel/450/280", title: "Pixel Art", desc: "Retro gaming assets." },
+            { url: "https://picsum.photos/seed/furniture/450/280", title: "Furnish", desc: "Modern home decor." }
+        ];
+
+        // Data for Row 2
+        const images2 = [
+            { url: "https://picsum.photos/seed/chase/450/280", title: "Chase the Match", desc: "Football app UI." },
+            { url: "https://picsum.photos/seed/legora/450/280", title: "Legora", desc: "Legal tech solutions." },
+            { url: "https://picsum.photos/seed/music/450/280", title: "Wavelength", desc: "Music streaming." },
+            { url: "https://picsum.photos/seed/travel/450/280", title: "Wayfarer", desc: "Travel the world." },
+            { url: "https://picsum.photos/seed/finance/450/280", title: "Wealthly", desc: "Personal finance." }
+        ];
+
+        // Function to create cards and duplicate them for seamless infinite loop
+        function populateTrack(trackId, imageData) {
+            const track = document.getElementById(trackId);
+            
+            for (let i = 0; i < 2; i++) {
+                imageData.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <img src="${item.url}" alt="${item.title}">
+                        <div class="overlay">
+                            <h3>${item.title}</h3>
+                            <p>${item.desc}</p>
+                        </div>
+                    `;
+                    track.appendChild(card);
+                });
+            }
+        }
+
+        populateTrack('track1', images1);
+        populateTrack('track2', images2);
+    </script>
+</body>
+</html>
